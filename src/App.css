@@ -1,0 +1,914 @@
+/* ============================================================================
+   Budget app styles
+   Organized top to bottom: design tokens → page layout → shared pieces → each
+   component. Colors are CSS custom properties, so dark mode is just a second set
+   of values at the bottom of the token section.
+   ========================================================================== */
+
+/* ---------- 1. Design tokens -------------------------------------------- */
+:root {
+  /* Surfaces */
+  --bg: #edf1ec; /* page: a faint sage, like ledger paper */
+  --surface: #ffffff; /* panels */
+  --surface-2: #f5f7f4; /* inputs, table stripes */
+  --hover: rgba(20, 32, 25, 0.05);
+
+  /* Ink (text) */
+  --ink: #142019;
+  --ink-2: #44524a;
+  --ink-3: #6b776f;
+
+  /* Lines */
+  --line: #dde3dd;
+  --line-strong: #c3ccc4;
+
+  /* Brand: a deep "money" green, used sparingly */
+  --accent: #1d6a4d;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcebe3;
+
+  /* The register (quick-add bar) is the one bold surface */
+  --register-bg: #123f2e;
+  --register-ink: #eef5f0;
+  --register-field: rgba(255, 255, 255, 0.08);
+  --register-line: rgba(255, 255, 255, 0.18);
+
+  /* Status: only for "over budget" / errors, always paired with text or an icon */
+  --critical: #c23434;
+  --critical-soft: #fbe9e7;
+
+  /* Charts */
+  --chart-actual: #1d6a4d;
+  --chart-pace: #a3aca6;
+  --chart-muted: #b8cbbf;
+
+  /* Type */
+  --font: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --step--1: 0.8125rem; /* 13px */
+  --step-0: 0.9375rem; /* 15px */
+  --step-1: 1.125rem; /* 18px */
+  --step-2: 1.5rem; /* 24px */
+  --step-3: 2.75rem; /* 44px */
+
+  /* Shape + space */
+  --radius: 10px;
+  --radius-small: 6px;
+  --gap: 16px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1411;
+    --surface: #161e1a;
+    --surface-2: #1d2621;
+    --hover: rgba(255, 255, 255, 0.05);
+    --ink: #e7eee9;
+    --ink-2: #b4c0b8;
+    --ink-3: #8a968e;
+    --line: #26302b;
+    --line-strong: #36423b;
+    --accent: #4fb386;
+    --accent-ink: #0c1a13;
+    --accent-soft: #1d3a2d;
+    --register-bg: #0f3123;
+    --critical: #ef6b6b;
+    --critical-soft: #3a1d1d;
+    --chart-actual: #4fb386;
+    --chart-pace: #66726b;
+    --chart-muted: #2f4c3d;
+    color-scheme: dark;
+  }
+}
+
+/* ---------- 2. Page ------------------------------------------------------- */
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--step-0);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 24px 64px;
+  display: grid;
+  gap: var(--gap);
+}
+
+/* ---------- 3. Shared pieces --------------------------------------------- */
+.muted {
+  color: var(--ink-3);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  border-radius: var(--radius-small);
+  padding: 8px 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.btn:hover {
+  background: var(--surface-2);
+}
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.btn--primary:hover {
+  background: var(--accent);
+  filter: brightness(1.08);
+}
+.btn--quiet {
+  border-color: transparent;
+  background: transparent;
+  color: var(--accent);
+  padding: 6px 8px;
+}
+.btn--quiet:hover {
+  background: var(--hover);
+}
+.btn--icon {
+  border-color: transparent;
+  background: transparent;
+  padding: 4px 8px;
+  color: var(--ink-2);
+}
+.btn--icon:hover {
+  background: var(--hover);
+}
+.btn--danger:hover {
+  color: var(--critical);
+}
+.btn--small {
+  padding: 4px 10px;
+  font-size: var(--step--1);
+}
+.btn--large {
+  padding: 12px 20px;
+  font-size: var(--step-1);
+}
+
+input,
+select {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  padding: 8px 10px;
+  min-height: 40px;
+}
+input:focus,
+select:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.banner {
+  padding: 10px 14px;
+  border-radius: var(--radius-small);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.banner--error {
+  background: var(--critical-soft);
+  color: var(--critical);
+}
+
+/* Panels: white cards on the sage page. One radius, no shadows. */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  min-width: 0; /* lets charts shrink inside grid cells */
+}
+.panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.panel__head h2 {
+  font-size: var(--step-1);
+  font-weight: 600;
+}
+.panel__hint {
+  color: var(--ink-3);
+  font-size: var(--step--1);
+  text-align: right;
+}
+
+/* ---------- 4. Top bar ---------------------------------------------------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+}
+.topbar__brand {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.topbar h1 {
+  font-size: var(--step-2);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.savestatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-3);
+  font-size: var(--step--1);
+}
+.savestatus__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.savestatus--saving .savestatus__dot {
+  background: var(--ink-3);
+}
+.savestatus--error {
+  color: var(--critical);
+}
+.savestatus--error .savestatus__dot {
+  background: var(--critical);
+}
+
+.monthnav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.monthnav .btn--icon {
+  font-size: var(--step-2);
+  line-height: 1;
+  padding: 2px 10px 6px;
+}
+.monthnav__label {
+  font-weight: 600;
+  font-size: var(--step-1);
+  min-width: 9.5em;
+  text-align: center;
+}
+
+.tabs {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  padding: 3px;
+}
+.tabs button {
+  border: 0;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 4px;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+.tabs button[aria-selected='true'] {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+/* ---------- 5. The register (quick add) ---------------------------------- */
+/* The one loud element: a dark green strip where entering a purchase takes
+   a few keystrokes. Everything else on the page stays quiet. */
+.register {
+  background: var(--register-bg);
+  color: var(--register-ink);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+.register input {
+  background: var(--register-field);
+  border-color: var(--register-line);
+  color: var(--register-ink);
+}
+.register input::placeholder {
+  color: rgba(238, 245, 240, 0.45);
+}
+.register input:focus {
+  border-color: #9fd9bd;
+  box-shadow: 0 0 0 3px rgba(159, 217, 189, 0.25);
+}
+.register .field__label {
+  color: rgba(238, 245, 240, 0.7);
+}
+.register input[type='date'] {
+  color-scheme: dark;
+}
+.register .btn--primary {
+  background: #e7f5ec;
+  border-color: #e7f5ec;
+  color: #123f2e;
+}
+.register .btn--quiet {
+  color: #9fd9bd;
+}
+.register .btn--quiet:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.register .txform__problem {
+  color: #ffb4a8;
+}
+
+/* ---------- 6. Transaction form ------------------------------------------ */
+.txform {
+  display: grid;
+  gap: 14px;
+}
+.txform__row {
+  display: grid;
+  /* amount | description (grows) | date | account */
+  grid-template-columns: minmax(150px, 190px) minmax(180px, 1fr) 160px 170px;
+  gap: 12px;
+  align-items: end;
+}
+.field {
+  display: grid;
+  gap: 4px;
+}
+.field__label {
+  font-size: var(--step--1);
+  color: var(--ink-3);
+  font-weight: 500;
+  padding: 0;
+}
+
+/* The big amount box: the first thing your cursor lands in */
+.amount-input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--step-2);
+  font-weight: 600;
+}
+.amount-input input {
+  font-size: var(--step-2);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-height: 48px;
+  padding: 4px 10px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chips legend {
+  margin-bottom: 6px;
+}
+.chip {
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: var(--step--1);
+  font-weight: 500;
+}
+.chip:hover {
+  background: var(--hover);
+}
+.chip[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.register .chip {
+  border-color: var(--register-line);
+  color: var(--register-ink);
+}
+.register .chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.register .chip[aria-pressed='true'] {
+  background: #e7f5ec;
+  border-color: #e7f5ec;
+  color: #123f2e;
+}
+
+.txform__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.txform__problem {
+  flex: 1;
+  color: var(--critical);
+  font-size: var(--step--1);
+  font-weight: 500;
+}
+
+/* In the edit dialog the four fields stack two-by-two */
+.txform--dialog .txform__row {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ---------- 7. Dashboard layout ------------------------------------------ */
+/* Two columns: categories + latest on the left, charts + goals on the right */
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: var(--gap);
+  align-items: start;
+}
+.dashboard__main,
+.dashboard__side {
+  display: grid;
+  gap: var(--gap);
+}
+.stats {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--gap);
+}
+
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+}
+.stat__label {
+  color: var(--ink-2);
+  font-size: var(--step--1);
+  font-weight: 500;
+}
+.stat__value {
+  font-size: var(--step-3);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+.stat__value--small {
+  font-size: var(--step-2);
+  letter-spacing: -0.01em;
+}
+.stat__value.is-negative {
+  color: var(--critical);
+}
+.stat__sub {
+  color: var(--ink-3);
+  font-size: var(--step--1);
+}
+.stat__bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  margin: 8px 0 4px;
+}
+.stat__bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.stat__bar span.is-over {
+  background: var(--critical);
+}
+
+/* ---------- 8. Category envelopes ---------------------------------------- */
+.envelopes {
+  display: grid;
+}
+.envelope {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr minmax(84px, auto);
+  grid-template-areas:
+    'name nums'
+    'bar  left';
+  gap: 2px 14px;
+  align-items: center;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  padding: 8px 6px;
+  border-radius: 0;
+}
+.envelopes li:first-child .envelope {
+  border-top: 0;
+}
+.envelope:hover {
+  background: var(--hover);
+}
+.envelope__name {
+  grid-area: name;
+  font-weight: 500;
+}
+.envelope__nums {
+  grid-area: nums;
+  font-variant-numeric: tabular-nums;
+}
+.envelope__bar {
+  grid-area: bar;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  margin: 2px 0;
+}
+.envelope__bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 0 4px 4px 0;
+}
+.envelope__left {
+  grid-area: left;
+  text-align: right;
+  white-space: nowrap;
+  font-size: var(--step--1);
+  color: var(--ink-3);
+}
+.envelope--over .envelope__bar span {
+  background: var(--critical);
+}
+.envelope--over .envelope__left {
+  color: var(--critical);
+  font-weight: 600;
+}
+
+/* ---------- 9. Charts ----------------------------------------------------- */
+.chart-summary {
+  margin-bottom: 8px;
+  color: var(--ink-2);
+}
+.chart-summary strong {
+  color: var(--ink);
+}
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  font-size: var(--step--1);
+  color: var(--ink-2);
+  margin-bottom: 4px;
+}
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+.swatch--actual {
+  background: var(--chart-actual);
+}
+.swatch--pace {
+  background: var(--chart-pace);
+}
+.chart {
+  margin-left: -8px; /* lines the y-axis labels up with the panel text */
+  font-variant-numeric: tabular-nums;
+}
+.chart-tip {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-small);
+  padding: 8px 10px;
+  font-size: var(--step--1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+.chart-tip__label {
+  color: var(--ink-3);
+  margin-bottom: 2px;
+}
+.chart-tip__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chart-tip__swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+/* ---------- 10. Transactions table --------------------------------------- */
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.filters select {
+  max-width: 260px;
+}
+.txtable {
+  width: 100%;
+  border-collapse: collapse;
+}
+.txtable th {
+  text-align: left;
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--ink-3);
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line-strong);
+}
+.txtable td {
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.txtable tr:last-child td {
+  border-bottom: 0;
+}
+.txtable .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.txtable__date {
+  color: var(--ink-3);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.txtable__cat {
+  color: var(--ink-2);
+}
+.txtable__catline {
+  display: none;
+  color: var(--ink-3);
+  font-size: var(--step--1);
+}
+.txtable__note {
+  color: var(--ink-3);
+  font-size: var(--step--1);
+}
+.txtable__actions {
+  white-space: nowrap;
+  text-align: right;
+  width: 1%;
+}
+.txtable__actions .btn {
+  font-size: var(--step--1);
+  opacity: 0.55;
+}
+.txtable tr:hover .btn,
+.txtable .btn:focus-visible {
+  opacity: 1;
+}
+.empty {
+  color: var(--ink-3);
+  padding: 12px 0;
+}
+
+/* ---------- 11. Goals ----------------------------------------------------- */
+.goals {
+  display: grid;
+  gap: 14px;
+}
+.goal {
+  display: grid;
+  gap: 4px;
+}
+.goal__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.goal__name {
+  font-weight: 500;
+}
+.goal__value {
+  border: 0;
+  background: transparent;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border-bottom: 1px dashed var(--line-strong);
+}
+.goal__value:hover {
+  background: var(--hover);
+}
+.goal__edit {
+  display: flex;
+  gap: 6px;
+}
+.goal__edit input {
+  width: 110px;
+  min-height: 32px;
+  padding: 4px 8px;
+}
+.goal__bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.goal__bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.goal__meta {
+  font-size: var(--step--1);
+  color: var(--ink-3);
+}
+
+/* ---------- 12. Dialog + toast ------------------------------------------- */
+.dialog {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 20px;
+  width: min(560px, calc(100vw - 32px));
+}
+.dialog::backdrop {
+  background: rgba(10, 20, 15, 0.45);
+}
+.dialog__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.dialog__foot {
+  border-top: 1px solid var(--line);
+  margin-top: 16px;
+  padding-top: 12px;
+}
+.dialog__head h2 {
+  font-size: var(--step-1);
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 10px 16px;
+  border-radius: var(--radius-small);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  animation: toast-in 160ms ease-out;
+}
+.toast .btn--quiet {
+  color: var(--accent-soft);
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+/* ---------- 13. Welcome screen ------------------------------------------- */
+.welcome {
+  max-width: 560px;
+  margin: 14vh auto 0;
+  padding: 0 24px;
+  display: grid;
+  gap: 20px;
+}
+.welcome__title {
+  font-size: var(--step-3);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.welcome__lede {
+  font-size: var(--step-1);
+  color: var(--ink-2);
+}
+.welcome__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.welcome__note {
+  color: var(--ink-3);
+  font-size: var(--step--1);
+}
+
+/* ---------- 14. Smaller screens ------------------------------------------ */
+@media (max-width: 960px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+  .txform__row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .app {
+    padding: 16px 16px 64px;
+  }
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  .stat--hero {
+    grid-column: 1 / -1;
+  }
+  /* amount + description full width, date and account share a row */
+  .txform__row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .field--amount,
+  .field--grow {
+    grid-column: 1 / -1;
+  }
+  /* iPhone zooms into any field with text under 16px; this prevents that */
+  input,
+  select {
+    font-size: 16px;
+  }
+  .filters {
+    flex-direction: column;
+  }
+  .filters select {
+    max-width: none;
+  }
+  /* phones: category moves under the description; delete lives in the edit dialog */
+  .txtable th:nth-child(3),
+  .txtable td:nth-child(3),
+  .txtable .btn--danger {
+    display: none;
+  }
+  .txtable__catline {
+    display: block;
+  }
+  .txtable__actions .btn {
+    opacity: 1;
+  }
+  /* hide the "Paid with" column on phones */
+  .listview .txtable th:nth-child(4),
+  .listview .txtable td:nth-child(4) {
+    display: none;
+  }
+}
+.btn--danger-text {
+  color: var(--critical);
+}
+
+/* ---------- 15. Connect screen ------------------------------------------- */
+.connect {
+  display: grid;
+  gap: 14px;
+}
+.connect__actions {
+  display: flex;
+  gap: 10px;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
